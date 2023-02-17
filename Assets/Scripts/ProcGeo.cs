@@ -52,6 +52,5 @@ public class ProcGeo : MonoBehaviour
 
         GetComponent<MeshFilter>().sharedMesh = mesh;
 
-
     }
 }

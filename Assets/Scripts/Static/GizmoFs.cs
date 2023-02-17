@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class GizmosFs
 {
-    public static void DrawWireCircle(Vector3 poso, Quaternion roto, float radius, int detail = 32)
+    public static void DrawWireCircle(Vector3 position, Quaternion rotation, float radius, int detail = 32)
     {
 
         Vector3[] points3D = new Vector3[detail];
@@ -13,9 +13,9 @@ public static class GizmosFs
             float t = i / (float)detail;
             float angRad = t * MathFs.TAU;
 
-            Vector2 point2D = MathFs.GetUnitVectorByAngle(angRad);
+            Vector2 point2D = MathFs.GetUnitVectorByAngle(angRad) * radius;
 
-            points3D[i] = poso + roto * point2D;
+            points3D[i] = position + rotation * point2D;
 
         }
 

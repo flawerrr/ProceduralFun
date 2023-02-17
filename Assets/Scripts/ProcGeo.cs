@@ -28,6 +28,14 @@ public class ProcGeo : MonoBehaviour
             3, 1, 2
         };
 
+        List<Vector2> uvs = new List<Vector2>()
+        {
+            new Vector2(1,1),
+            new Vector2(0,1),
+            new Vector2(1,0),
+            new Vector2(0,0)
+        };
+
         List<Vector3> normals = new List<Vector3>()
         {
             Vector3.forward,
@@ -39,6 +47,7 @@ public class ProcGeo : MonoBehaviour
         mesh.SetVertices(points);
         mesh.triangles = triIndices;
         mesh.SetNormals(normals);
+        mesh.SetUVs(0, uvs);
         //mesh.RecalculateNormals();
 
         GetComponent<MeshFilter>().sharedMesh = mesh;

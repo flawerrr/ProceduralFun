@@ -14,7 +14,15 @@ public class QuadRing : MonoBehaviour
     float thickness = 1f;
     
     [SerializeField][Range(3, 32)] 
-    public int angularSegmentCount;
+    int angularSegmentCount;
+
+    public enum UvProjection
+    {
+        AngularRadial,
+        TopDown
+    };
+
+    public UvProjection uvProjection = UvProjection.AngularRadial;
 
     private Mesh mesh;
 
@@ -52,8 +60,9 @@ public class QuadRing : MonoBehaviour
         int vCount = vertexCount;
         List<Vector3> vertices = new List<Vector3>();
         List<Vector3> normals = new List<Vector3>();
+        List<Vector2> uvs = new List<Vector2>();
 
-        for (int i = 0; i < angularSegmentCount; i++)
+        for (int i = 0; i < angularSegmentCount + 1; i++)
         {
             float t = i / (float)angularSegmentCount;
             float angRad = t * MathFs.TAU;
@@ -64,6 +73,21 @@ public class QuadRing : MonoBehaviour
             
             normals.Add(Vector3.forward);
             normals.Add(Vector3.forward);
+
+            switch (uvProjection)
+            {
+                case UvProjection.AngularRadial:
+                    uvs.Add(new Vector2(t, 1));
+                    uvs.Add(new Vector2(t, 0));
+                    break;
+                    
+                case UvProjection.TopDown: 
+                    uvs.Add(dir * 0.5f + Vector2.one * 0.5f);
+                    uvs.Add(dir * (radiusInner/radiusOuter) * 0.5f + Vector2.one * 0.5f);
+                    break;
+            }
+            
+            
         }
 
         List<int> triangleIndices = new List<int>();
@@ -71,8 +95,8 @@ public class QuadRing : MonoBehaviour
         {
             int rootIndex = i * 2;
             int rootInnerIndex = rootIndex + 1;
-            int rootOuterNext = (rootIndex + 2) % vCount;
-            int rootInnerNext = (rootIndex + 3) % vCount;
+            int rootOuterNext = (rootIndex + 2);
+            int rootInnerNext = (rootIndex + 3);
             
             triangleIndices.Add(rootIndex);
             triangleIndices.Add(rootOuterNext);
@@ -85,6 +109,7 @@ public class QuadRing : MonoBehaviour
         
         mesh.SetVertices(vertices);
         mesh.SetTriangles(triangleIndices, 0);
+        mesh.SetUVs(0, uvs);
         mesh.SetNormals(normals);
     }
     

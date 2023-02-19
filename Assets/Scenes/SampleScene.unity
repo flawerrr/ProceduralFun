@@ -513,7 +513,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   radiusInner: 1.06
   thickness: 1.03
-  angularSegmentCount: 10
+  angularSegmentCount: 9
+  uvProjection: 0
 --- !u!23 &1617511966
 MeshRenderer:
   m_ObjectHideFlags: 0

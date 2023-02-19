@@ -8,6 +8,8 @@ using UnityEditor;
 
 public class RoadSegment : MonoBehaviour
 {
+    public bool drawLine = false;
+    
     [SerializeField] Transform[] controlPoints = new Transform[4];
 
     Vector3 GetPos(int i) => controlPoints[i].position;
@@ -32,7 +34,33 @@ public class RoadSegment : MonoBehaviour
         Gizmos.DrawLine(GetPos(0), GetPos(1));
         Gizmos.DrawLine(GetPos(2), GetPos(3));
         Gizmos.DrawSphere(GetBezierPoint(tTest), 0.05f);
-        
+
+        if (drawLine)
+        {
+
+            // Draw Bezier Lines
+            Vector3 p0 = GetPos(0);
+            Vector3 p1 = GetPos(1);
+            Vector3 p2 = GetPos(2);
+            Vector3 p3 = GetPos(3);
+
+            Gizmos.DrawLine(p0, p1);
+            Gizmos.DrawLine(p1, p2);
+            Gizmos.DrawLine(p3, p3);
+
+            Vector3 a = Vector3.Lerp(p0, p1, tTest);
+            Vector3 b = Vector3.Lerp(p1, p2, tTest);
+            Vector3 c = Vector3.Lerp(p2, p3, tTest);
+
+            Vector3 d = Vector3.Lerp(a, b, tTest);
+            Vector3 e = Vector3.Lerp(b, c, tTest);
+
+            Gizmos.DrawLine(a, b);
+            Gizmos.DrawLine(b, c);
+            Gizmos.DrawLine(d, e);
+        }
+
+
     }
 
     Vector3 GetBezierPoint(float t)

@@ -31,14 +31,18 @@ public class RoadSegment : MonoBehaviour
             GetPos(2), Color.white, EditorGUIUtility.whiteTexture, 1f
             );
         
+        OrientedPoint testPoint = GetBezierOP(tTest);
+
         Gizmos.DrawLine(GetPos(0), GetPos(1));
         Gizmos.DrawLine(GetPos(2), GetPos(3));
-        Gizmos.DrawSphere(GetBezierPoint(tTest), 0.05f);
+        Gizmos.DrawSphere(testPoint.pos, 0.05f);
 
+        Handles.PositionHandle(testPoint.pos, testPoint.rot);
+        
+        // Draw Bezier Lines
         if (drawLine)
         {
-
-            // Draw Bezier Lines
+            
             Vector3 p0 = GetPos(0);
             Vector3 p1 = GetPos(1);
             Vector3 p2 = GetPos(2);
@@ -63,7 +67,7 @@ public class RoadSegment : MonoBehaviour
 
     }
 
-    Vector3 GetBezierPoint(float t)
+    OrientedPoint GetBezierOP(float t)
     {
         Vector3 p0 = GetPos(0);
         Vector3 p1 = GetPos(1);
@@ -77,6 +81,16 @@ public class RoadSegment : MonoBehaviour
         Vector3 d = Vector3.Lerp(a, b, t);
         Vector3 e = Vector3.Lerp(b, c, t);
 
-        return Vector3.Lerp(d, e, t);
+        Vector3 pos = Vector3.Lerp(d, e, t);
+        
+        Vector3 tangent = (d - e).normalized * -1f;
+        
+        return new OrientedPoint(pos, tangent);
+    }
+    
+
+    Vector3 LocalToWorld(Vector3 locaSpacelPos)
+    {
+        return new Vector3(0, 0, 0);
     }
 }

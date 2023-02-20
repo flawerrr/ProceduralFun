@@ -5,14 +5,14 @@ using UnityEngine;
 [CreateAssetMenu]
 public class Mesh2D : ScriptableObject
 {
-    [System.Serializable]
-    public class Vertex
+
+    [System.Serializable]public class Vertex
     {
-        public Vector2 points;
-        public Vector2 normals;
+        public Vector2 point;
+        public Vector2 normal;
         public float u; 
     }
 
-    private Vertex[] _vertices;
-    private int[] lineIndices;
+    public Vertex[] vertices;
+    public int[] lineIndices;
 }

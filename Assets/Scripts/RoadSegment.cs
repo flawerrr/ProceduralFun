@@ -10,6 +10,8 @@ public class RoadSegment : MonoBehaviour
 {
     public bool drawLine = false;
 
+    [SerializeField] private Mesh2D shape;
+
     [SerializeField] Transform[] controlPoints = new Transform[4];
     Vector3 GetPos(int i) => controlPoints[i].position;
 
@@ -32,21 +34,25 @@ public class RoadSegment : MonoBehaviour
 
         OrientedPoint testPoint = GetBezierOP(tTest);
         
-        float radius = 0.05f;        
+        float radius = 0.1f;        
 
         Gizmos.DrawLine(GetPos(0), GetPos(1));
         Gizmos.DrawLine(GetPos(2), GetPos(3));
-        Gizmos.DrawSphere(testPoint.pos, radius);
+        //Gizmos.DrawSphere(testPoint.pos, radius);
 
         Handles.PositionHandle(testPoint.pos, testPoint.rot);
         
         void DrawPoint(Vector3 localPos) => Gizmos.DrawSphere(testPoint.LocalToWorld(localPos), radius);
         
-        DrawPoint(Vector3.right * 0.5f);
-        DrawPoint(Vector3.right * - 0.5f);
+        //DrawPoint(Vector3.right * 0.5f);
+        //DrawPoint(Vector3.right * - 0.5f);
 
- 
-
+        for (int i = 0; i < shape.vertices.Length; i++)
+        {
+            Gizmos.color = Color.red;
+            DrawPoint(shape.vertices[i].point);
+        }
+        
         // Draw Bezier Lines
         if (drawLine)
         {
@@ -71,8 +77,7 @@ public class RoadSegment : MonoBehaviour
             Gizmos.DrawLine(b, c);
             Gizmos.DrawLine(d, e);
         }
-
-
+        
     }
 
     OrientedPoint GetBezierOP(float t)
@@ -91,7 +96,7 @@ public class RoadSegment : MonoBehaviour
 
         Vector3 pos = Vector3.Lerp(d, e, t);
 
-        Vector3 tangent = (d - e).normalized * -1f;
+        Vector3 tangent = (d - e).normalized;
 
         return new OrientedPoint(pos, tangent);
     }

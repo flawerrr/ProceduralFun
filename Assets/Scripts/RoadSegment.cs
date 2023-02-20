@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using System.Linq;
 
 [RequireComponent(typeof(MeshFilter))]
 
@@ -10,13 +11,60 @@ public class RoadSegment : MonoBehaviour
 {
     public bool drawLine = false;
 
-    [SerializeField] private Mesh2D shape;
+    [SerializeField] private Mesh2D shape2D;
+    
+    [Range(2,20)][SerializeField] private int edgeRingCount = 3;
 
     [SerializeField] Transform[] controlPoints = new Transform[4];
     Vector3 GetPos(int i) => controlPoints[i].position;
 
     [Range(0, 1)] [SerializeField] private float tTest = 0;
+    
+    Mesh mesh;
 
+
+    private void Awake()
+    {
+        mesh = new Mesh();
+        mesh.name = "RoadMesh";
+
+        GetComponent<MeshFilter>().sharedMesh = mesh;
+    }
+
+    private void Update()
+    {
+        GenerateMesh();
+    }
+
+    void GenerateMesh()
+    {
+        mesh.Clear();
+        
+        //________
+        //VERTICES
+        
+        List<Vector3> verts = new List<Vector3>();
+
+        for (int ring = 0; ring < edgeRingCount; ring++)
+        {
+            float t = ring / (edgeRingCount - 1f);
+            OrientedPoint op = GetBezierOP(t);
+            
+            for (int i = 0; i < shape2D.vertexCount; i++)
+            {
+                verts.Add(op.LocalToWorldPos(shape2D.vertices[i].point));
+            }
+        }
+        
+        //_________
+        //TRIANGLES
+
+        for (int ring = 0; ring < edgeRingCount-1; ring++)
+        {
+            int rootIndex = ring * shape2D.vertexCount;
+            int rootIndexNext = rootIndex + 1;
+        }
+    }
 
     public void OnDrawGizmos()
     {
@@ -34,23 +82,25 @@ public class RoadSegment : MonoBehaviour
 
         OrientedPoint testPoint = GetBezierOP(tTest);
         
-        float radius = 0.1f;        
-
         Gizmos.DrawLine(GetPos(0), GetPos(1));
         Gizmos.DrawLine(GetPos(2), GetPos(3));
         //Gizmos.DrawSphere(testPoint.pos, radius);
 
         Handles.PositionHandle(testPoint.pos, testPoint.rot);
         
-        void DrawPoint(Vector3 localPos) => Gizmos.DrawSphere(testPoint.LocalToWorld(localPos), radius);
+        //void DrawPoint(Vector3 localPos) => Gizmos.DrawSphere(testPoint.LocalToWorld(localPos), radius);
         
         //DrawPoint(Vector3.right * 0.5f);
         //DrawPoint(Vector3.right * - 0.5f);
 
-        for (int i = 0; i < shape.vertices.Length; i++)
+        Vector3[] verts = shape2D.vertices.Select(v => testPoint.LocalToWorldPos(v.point)).ToArray();
+
+        for (int i = 0; i < shape2D.vertices.Length; i+=2)
         {
-            Gizmos.color = Color.red;
-            DrawPoint(shape.vertices[i].point);
+            Vector3 a = verts[shape2D.lineIndices[i]];
+            Vector3 b = verts[shape2D.lineIndices[i+1]];
+            
+            Gizmos.DrawLine(a,b);
         }
         
         // Draw Bezier Lines
@@ -77,7 +127,6 @@ public class RoadSegment : MonoBehaviour
             Gizmos.DrawLine(b, c);
             Gizmos.DrawLine(d, e);
         }
-        
     }
 
     OrientedPoint GetBezierOP(float t)
@@ -100,4 +149,5 @@ public class RoadSegment : MonoBehaviour
 
         return new OrientedPoint(pos, tangent);
     }
+    
 }

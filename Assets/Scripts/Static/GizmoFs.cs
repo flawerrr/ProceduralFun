@@ -24,6 +24,5 @@ public static class GizmosFs
             Gizmos.DrawLine(points3D[i], points3D[i+1]);
         }
         Gizmos.DrawLine(points3D[detail-1], points3D[0]);
-        
     }
 }

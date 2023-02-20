@@ -5,7 +5,6 @@ using UnityEngine;
 [CreateAssetMenu]
 public class Mesh2D : ScriptableObject
 {
-
     [System.Serializable]public class Vertex
     {
         public Vector2 point;
@@ -14,5 +13,6 @@ public class Mesh2D : ScriptableObject
     }
 
     public Vertex[] vertices;
+    public int vertexCount => vertices.Length;
     public int[] lineIndices;
 }

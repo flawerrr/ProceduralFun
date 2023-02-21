@@ -13,7 +13,7 @@ public class RoadSegment : MonoBehaviour
 
     [SerializeField] private Mesh2D shape2D;
     
-    [Range(2,20)][SerializeField] private int edgeRingCount = 3;
+    [Range(2,100)][SerializeField] private int edgeRingCount = 3;
 
     [SerializeField] Transform[] controlPoints = new Transform[4];
     Vector3 GetPos(int i) => controlPoints[i].position;
@@ -44,26 +44,53 @@ public class RoadSegment : MonoBehaviour
         //VERTICES
         
         List<Vector3> verts = new List<Vector3>();
+        List<Vector3> norms = new List<Vector3>();
 
         for (int ring = 0; ring < edgeRingCount; ring++)
         {
             float t = ring / (edgeRingCount - 1f);
             OrientedPoint op = GetBezierOP(t);
             
-            for (int i = 0; i < shape2D.vertexCount; i++)
+            for (int i = 0; i < shape2D.VertexCount; i++)
             {
                 verts.Add(op.LocalToWorldPos(shape2D.vertices[i].point));
+                norms.Add(op.LocalToWorldVect(shape2D.vertices[i].normal));
             }
         }
         
         //_________
         //TRIANGLES
 
-        for (int ring = 0; ring < edgeRingCount-1; ring++)
+        List<int> triIndices = new List<int>();
+
+        for (int ring = 0; ring < edgeRingCount - 1; ring++)
         {
-            int rootIndex = ring * shape2D.vertexCount;
-            int rootIndexNext = rootIndex + 1;
+            int rootIndex = ring * shape2D.VertexCount;
+            int rootIndexNext = (ring+1) * shape2D.VertexCount;
+
+            for (int line = 0; line < shape2D.LineCount; line+=2)
+            {
+                int lineIndexA = shape2D.lineIndices[line];
+                int lineIndexB = shape2D.lineIndices[line+1];
+                int currentA = rootIndex + lineIndexA;
+                int currentB = rootIndex + lineIndexB;
+                int nextA = rootIndexNext + lineIndexA;
+                int nextB = rootIndexNext + lineIndexB;
+                
+                triIndices.Add(currentA);
+                triIndices.Add(nextA);
+                triIndices.Add(nextB);
+                
+                triIndices.Add(currentA);
+                triIndices.Add(nextB);
+                triIndices.Add(currentB);
+            }
         }
+        
+        mesh.SetVertices(verts);
+        mesh.SetTriangles(triIndices, 0);
+        mesh.SetNormals(norms);
+        
     }
 
     public void OnDrawGizmos()
@@ -145,7 +172,7 @@ public class RoadSegment : MonoBehaviour
 
         Vector3 pos = Vector3.Lerp(d, e, t);
 
-        Vector3 tangent = (d - e).normalized;
+        Vector3 tangent = (d - e).normalized * -1;
 
         return new OrientedPoint(pos, tangent);
     }
